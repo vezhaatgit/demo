@@ -1,0 +1,55 @@
+import javax.swing.*;        // for the window and button
+import java.awt.event.*;     // for responding to clicks
+import java.io.*;            // for input/output and errors
+
+public class RunExeButton {
+    public static void main(String[] args) {
+        // 1) Create a little window (frame) and a button inside it
+        JFrame frame = new JFrame("Launch EXE");
+        JButton button = new JButton("Run My App");
+
+        // 2) What happens when the button is clicked:
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    // <-- Put the full path to your .exe here:
+                    // Example: "C:\\Users\\YourName\\Desktop\\MyApp.exe"
+                    // or "C:/Users/YourName/Desktop/MyApp.exe" (forward slashes also work)
+                    String exePath = "C:\\Path\\To\\YourApp.exe";
+
+                    // This line prepares to start the external program
+                    ProcessBuilder pb = new ProcessBuilder(exePath);
+
+                    // Optional: set a working folder (if your EXE expects to run in a folder)
+                    // pb.directory(new File("C:\\Path\\To"));
+
+                    // Start the EXE
+                    Process process = pb.start();
+
+                    // Optional: read any text the EXE writes (so you can show it)
+                    InputStream is = process.getInputStream();
+                    java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+                    String output = s.hasNext() ? s.next() : "";
+
+                    // If the EXE printed something, show it in a small dialog
+                    if (!output.isEmpty()) {
+                        JOptionPane.showMessageDialog(frame, "Program output:\n" + output);
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Application started.");
+                    }
+                } catch (IOException ex) {  // Happens if file not found or cannot be run
+                    JOptionPane.showMessageDialog(frame, "Error: " + ex.getMessage(),
+                        "Launch Failed", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        // Put the button into the window and show it
+        frame.add(button);
+        frame.pack(); // sizes the window to fit contents
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null); // center on screen
+        frame.setVisible(true);
+    }
+}
